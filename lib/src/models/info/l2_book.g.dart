@@ -1,0 +1,35 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'l2_book.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+L2Book _$L2BookFromJson(Map<String, dynamic> json) => L2Book(
+      coin: json['coin'] as String,
+      time: (json['time'] as num).toInt(),
+      levels: (json['levels'] as List<dynamic>)
+          .map((e) => (e as List<dynamic>)
+              .map((e) => BookLevel.fromJson(e as Map<String, dynamic>))
+              .toList())
+          .toList(),
+    );
+
+Map<String, dynamic> _$L2BookToJson(L2Book instance) => <String, dynamic>{
+      'coin': instance.coin,
+      'time': instance.time,
+      'levels': instance.levels,
+    };
+
+BookLevel _$BookLevelFromJson(Map<String, dynamic> json) => BookLevel(
+      px: json['px'] as String,
+      sz: json['sz'] as String,
+      n: (json['n'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$BookLevelToJson(BookLevel instance) => <String, dynamic>{
+      'px': instance.px,
+      'sz': instance.sz,
+      'n': instance.n,
+    };

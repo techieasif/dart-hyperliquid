@@ -5,6 +5,7 @@ import 'package:msgpack_dart/msgpack_dart.dart';
 import 'package:pointycastle/digests/keccak.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:web3dart/credentials.dart';
+import 'package:web3dart/crypto.dart';
 
 /// Utility class for cryptographic operations required by Hyperliquid.
 ///
@@ -88,6 +89,18 @@ class SigningUtils {
       return 'Agent(string source,bytes32 connectionId)';
     } else if (primaryType == 'EIP712Domain') {
       return 'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)';
+    } else if (primaryType == 'HyperliquidTransaction:UsdSend') {
+      return 'HyperliquidTransaction:UsdSend(string hyperliquidChain,string destination,string amount,uint64 time)';
+    } else if (primaryType == 'HyperliquidTransaction:SpotSend') {
+      return 'HyperliquidTransaction:SpotSend(string hyperliquidChain,string destination,string token,string amount,uint64 time)';
+    } else if (primaryType == 'HyperliquidTransaction:Withdraw') {
+      return 'HyperliquidTransaction:Withdraw(string hyperliquidChain,string destination,string amount,uint64 time)';
+    } else if (primaryType == 'HyperliquidTransaction:ApproveAgent') {
+      return 'HyperliquidTransaction:ApproveAgent(string hyperliquidChain,address agentAddress,string agentName,uint64 nonce)';
+    } else if (primaryType == 'HyperliquidTransaction:CreateSubAccount') {
+      return 'HyperliquidTransaction:CreateSubAccount(string hyperliquidChain,string name,uint64 nonce)';
+    } else if (primaryType == 'HyperliquidTransaction:SubAccountTransfer') {
+      return 'HyperliquidTransaction:SubAccountTransfer(string hyperliquidChain,address subAccountUser,bool isDeposit,string usd,uint64 nonce)';
     }
     throw UnimplementedError('Type $primaryType not implemented');
   }
@@ -149,13 +162,13 @@ class SigningUtils {
   /// 2. Constructing a phantom agent.
   /// 3. Creating the EIP-712 domain and message.
   /// 4. Signing the EIP-712 hash.
-  static dynamic signL1Action(
+  static Future<MsgSignature> signL1Action(
     Credentials wallet,
     Map<String, dynamic> action,
     String? vaultAddress,
     int nonce,
     bool isMainnet,
-  ) {
+  ) async {
     final hash = actionHash(action, vaultAddress, nonce);
     final phantomAgent = constructPhantomAgent(hash, isMainnet);
 
@@ -189,10 +202,106 @@ class SigningUtils {
 
     final digest = keccak256(builder.toBytes());
 
-    if (wallet is EthPrivateKey) {
-      return wallet.sign(digest);
-    } else {
-      throw Exception('Only EthPrivateKey supported for now');
-    }
+    return wallet.signToSignature(digest, chainId: isMainnet ? 42161 : 421614);
   }
+
+  /// Signs a user-signed action (e.g., transfers, withdrawals).
+  ///
+  /// [types] should contain the EIP-712 type definitions.
+  /// [primaryType] is the name of the primary type (e.g., "UsdSend").
+  static Future<MsgSignature> signUserSignedAction(
+    Credentials wallet,
+    Map<String, dynamic> action,
+    Map<String, List<Map<String, String>>> types,
+    String primaryType,
+    int chainId,
+  ) async {
+    final domain = {
+      'name': 'HyperliquidSignTransaction',
+      'version': '1',
+      'chainId': chainId,
+      'verifyingContract': '0x0000000000000000000000000000000000000000',
+    };
+
+    // Merge domain types with action types
+    final allTypes = {
+      'EIP712Domain': [
+        {'name': 'name', 'type': 'string'},
+        {'name': 'version', 'type': 'string'},
+        {'name': 'chainId', 'type': 'uint256'},
+        {'name': 'verifyingContract', 'type': 'address'},
+      ],
+      ...types,
+    };
+
+    final domainSeparator = hashStruct('EIP712Domain', domain, allTypes);
+    final messageHash = hashStruct(primaryType, action, allTypes);
+
+    final builder = BytesBuilder();
+    builder.add(Uint8List.fromList([0x19, 0x01]));
+    builder.add(domainSeparator);
+    builder.add(messageHash);
+
+    final digest = keccak256(builder.toBytes());
+
+    return wallet.signToSignature(digest, chainId: chainId);
+  }
+
+  // --- EIP-712 Type Definitions ---
+
+  static const Map<String, List<Map<String, String>>> usdSendTypes = {
+    'HyperliquidTransaction:UsdSend': [
+      {'name': 'hyperliquidChain', 'type': 'string'},
+      {'name': 'destination', 'type': 'string'},
+      {'name': 'amount', 'type': 'string'},
+      {'name': 'time', 'type': 'uint64'},
+    ],
+  };
+
+  static const Map<String, List<Map<String, String>>> spotSendTypes = {
+    'HyperliquidTransaction:SpotSend': [
+      {'name': 'hyperliquidChain', 'type': 'string'},
+      {'name': 'destination', 'type': 'string'},
+      {'name': 'token', 'type': 'string'},
+      {'name': 'amount', 'type': 'string'},
+      {'name': 'time', 'type': 'uint64'},
+    ],
+  };
+
+  static const Map<String, List<Map<String, String>>> withdraw3Types = {
+    'HyperliquidTransaction:Withdraw': [
+      {'name': 'hyperliquidChain', 'type': 'string'},
+      {'name': 'destination', 'type': 'string'},
+      {'name': 'amount', 'type': 'string'},
+      {'name': 'time', 'type': 'uint64'},
+    ],
+  };
+
+  static const Map<String, List<Map<String, String>>> approveAgentTypes = {
+    'HyperliquidTransaction:ApproveAgent': [
+      {'name': 'hyperliquidChain', 'type': 'string'},
+      {'name': 'agentAddress', 'type': 'address'},
+      {'name': 'agentName', 'type': 'string'},
+      {'name': 'nonce', 'type': 'uint64'},
+    ],
+  };
+
+  static const Map<String, List<Map<String, String>>> createSubAccountTypes = {
+    'HyperliquidTransaction:CreateSubAccount': [
+      {'name': 'hyperliquidChain', 'type': 'string'},
+      {'name': 'name', 'type': 'string'},
+      {'name': 'nonce', 'type': 'uint64'},
+    ],
+  };
+
+  static const Map<String, List<Map<String, String>>> subAccountTransferTypes =
+      {
+    'HyperliquidTransaction:SubAccountTransfer': [
+      {'name': 'hyperliquidChain', 'type': 'string'},
+      {'name': 'subAccountUser', 'type': 'address'},
+      {'name': 'isDeposit', 'type': 'bool'},
+      {'name': 'usd', 'type': 'string'},
+      {'name': 'nonce', 'type': 'uint64'},
+    ],
+  };
 }

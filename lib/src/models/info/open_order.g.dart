@@ -1,0 +1,31 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'open_order.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+OpenOrder _$OpenOrderFromJson(Map<String, dynamic> json) => OpenOrder(
+      coin: json['coin'] as String,
+      side: json['side'] as String,
+      limitPx: json['limitPx'] as String,
+      sz: json['sz'] as String,
+      oid: (json['oid'] as num).toInt(),
+      timestamp: (json['timestamp'] as num).toInt(),
+      origSz: json['origSz'] as String,
+      cloid: json['cloid'] as String?,
+      reduceOnly: json['reduceOnly'] as bool,
+    );
+
+Map<String, dynamic> _$OpenOrderToJson(OpenOrder instance) => <String, dynamic>{
+      'coin': instance.coin,
+      'side': instance.side,
+      'limitPx': instance.limitPx,
+      'sz': instance.sz,
+      'oid': instance.oid,
+      'timestamp': instance.timestamp,
+      'origSz': instance.origSz,
+      'cloid': instance.cloid,
+      'reduceOnly': instance.reduceOnly,
+    };

@@ -1,0 +1,113 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'clearinghouse_state.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+ClearinghouseState _$ClearinghouseStateFromJson(Map<String, dynamic> json) =>
+    ClearinghouseState(
+      marginSummary:
+          MarginSummary.fromJson(json['marginSummary'] as Map<String, dynamic>),
+      crossMarginSummary: MarginSummary.fromJson(
+          json['crossMarginSummary'] as Map<String, dynamic>),
+      crossMaintenanceMarginUsed: json['crossMaintenanceMarginUsed'] as String,
+      withdrawable: json['withdrawable'] as String,
+      assetPositions: (json['assetPositions'] as List<dynamic>)
+          .map((e) => AssetPosition.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      time: (json['time'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$ClearinghouseStateToJson(ClearinghouseState instance) =>
+    <String, dynamic>{
+      'marginSummary': instance.marginSummary,
+      'crossMarginSummary': instance.crossMarginSummary,
+      'crossMaintenanceMarginUsed': instance.crossMaintenanceMarginUsed,
+      'withdrawable': instance.withdrawable,
+      'assetPositions': instance.assetPositions,
+      'time': instance.time,
+    };
+
+MarginSummary _$MarginSummaryFromJson(Map<String, dynamic> json) =>
+    MarginSummary(
+      accountValue: json['accountValue'] as String,
+      totalNtlPos: json['totalNtlPos'] as String,
+      totalRawUsd: json['totalRawUsd'] as String,
+      totalMarginUsed: json['totalMarginUsed'] as String,
+    );
+
+Map<String, dynamic> _$MarginSummaryToJson(MarginSummary instance) =>
+    <String, dynamic>{
+      'accountValue': instance.accountValue,
+      'totalNtlPos': instance.totalNtlPos,
+      'totalRawUsd': instance.totalRawUsd,
+      'totalMarginUsed': instance.totalMarginUsed,
+    };
+
+AssetPosition _$AssetPositionFromJson(Map<String, dynamic> json) =>
+    AssetPosition(
+      type: json['type'] as String,
+      position: Position.fromJson(json['position'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$AssetPositionToJson(AssetPosition instance) =>
+    <String, dynamic>{
+      'type': instance.type,
+      'position': instance.position,
+    };
+
+Position _$PositionFromJson(Map<String, dynamic> json) => Position(
+      coin: json['coin'] as String,
+      szi: json['szi'] as String,
+      leverage: Leverage.fromJson(json['leverage'] as Map<String, dynamic>),
+      entryPx: json['entryPx'] as String,
+      positionValue: json['positionValue'] as String,
+      unrealizedPnl: json['unrealizedPnl'] as String,
+      returnOnEquity: json['returnOnEquity'] as String,
+      liquidationPx: json['liquidationPx'] as String,
+      marginUsed: json['marginUsed'] as String,
+      maxLeverage: (json['maxLeverage'] as num).toInt(),
+      cumFunding:
+          CumFunding.fromJson(json['cumFunding'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$PositionToJson(Position instance) => <String, dynamic>{
+      'coin': instance.coin,
+      'szi': instance.szi,
+      'leverage': instance.leverage,
+      'entryPx': instance.entryPx,
+      'positionValue': instance.positionValue,
+      'unrealizedPnl': instance.unrealizedPnl,
+      'returnOnEquity': instance.returnOnEquity,
+      'liquidationPx': instance.liquidationPx,
+      'marginUsed': instance.marginUsed,
+      'maxLeverage': instance.maxLeverage,
+      'cumFunding': instance.cumFunding,
+    };
+
+Leverage _$LeverageFromJson(Map<String, dynamic> json) => Leverage(
+      type: json['type'] as String,
+      value: (json['value'] as num).toInt(),
+      rawUsd: json['rawUsd'] as String?,
+    );
+
+Map<String, dynamic> _$LeverageToJson(Leverage instance) => <String, dynamic>{
+      'type': instance.type,
+      'value': instance.value,
+      'rawUsd': instance.rawUsd,
+    };
+
+CumFunding _$CumFundingFromJson(Map<String, dynamic> json) => CumFunding(
+      allTime: json['allTime'] as String,
+      sinceOpen: json['sinceOpen'] as String,
+      sinceChange: json['sinceChange'] as String,
+    );
+
+Map<String, dynamic> _$CumFundingToJson(CumFunding instance) =>
+    <String, dynamic>{
+      'allTime': instance.allTime,
+      'sinceOpen': instance.sinceOpen,
+      'sinceChange': instance.sinceChange,
+    };

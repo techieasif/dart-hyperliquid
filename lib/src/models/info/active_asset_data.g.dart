@@ -1,0 +1,27 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'active_asset_data.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+ActiveAssetData _$ActiveAssetDataFromJson(Map<String, dynamic> json) =>
+    ActiveAssetData(
+      user: json['user'] as String,
+      coin: json['coin'] as String,
+      leverage: Leverage.fromJson(json['leverage'] as Map<String, dynamic>),
+      maxTradeSzs: json['maxTradeSzs'] as List<dynamic>,
+      availableToTrade: json['availableToTrade'] as List<dynamic>,
+      markPx: json['markPx'] as String,
+    );
+
+Map<String, dynamic> _$ActiveAssetDataToJson(ActiveAssetData instance) =>
+    <String, dynamic>{
+      'user': instance.user,
+      'coin': instance.coin,
+      'leverage': instance.leverage,
+      'maxTradeSzs': instance.maxTradeSzs,
+      'availableToTrade': instance.availableToTrade,
+      'markPx': instance.markPx,
+    };

@@ -56,11 +56,15 @@ print('ETH Price: ${mids['ETH']}');
 // 3. Get User State (Account Value, Positions)
 final userAddress = '0x...';
 final userState = await infoApi.getUserState(userAddress);
-print('Account Value: ${userState['marginSummary']['accountValue']}');
+print('Account Value: ${userState.marginSummary.accountValue}');
 
 // 4. Get Open Orders
 final openOrders = await infoApi.getOpenOrders(userAddress);
 print('Open Orders: ${openOrders.length}');
+
+// 5. Get L2 Order Book
+final l2Book = await infoApi.getL2Book('BTC');
+print('Best Bid: ${l2Book.levels[0][0].px}');
 ```
 
 ### 3. Exchange API (Trading)
@@ -95,13 +99,35 @@ try {
 }
 
 // 2. Cancel an Order
-try {
-  // You need the order ID (oid) from openOrders or placeOrder response
-  final result = await exchangeApi.cancelOrder('BTC', 123456789);
-  print('Order cancelled: $result');
-} catch (e) {
-  print('Cancel failed: $e');
-}
+await exchangeApi.cancelOrder('BTC', 123456789);
+
+// 3. Update Leverage
+await exchangeApi.updateLeverage('BTC', true, 20); // Cross, 20x
+
+// 4. Transfer Funds (USD)
+await exchangeApi.usdSend('0xRecipient...', 100.0);
+
+// 5. Withdraw to L1
+await exchangeApi.withdraw3('0xL1Address...', 1000.0);
+```
+
+### 4. WebSocket API (Real-time Data)
+
+The `HyperliquidSocket` allows you to subscribe to real-time events.
+
+```dart
+final socket = HyperliquidSocket();
+await socket.connect();
+
+// Subscribe to data
+socket.subscribeToL2Book('BTC');
+socket.subscribeToTrades('ETH');
+socket.subscribeToAllMids();
+
+// Listen to the stream
+socket.stream.listen((event) {
+  print('New Event: $event');
+});
 ```
 
 ## Development

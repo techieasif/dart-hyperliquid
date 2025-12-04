@@ -1,5 +1,11 @@
 import '../client.dart';
 import '../models/info/meta.dart';
+import '../models/info/l2_book.dart';
+import '../models/info/open_order.dart';
+import '../models/info/clearinghouse_state.dart';
+import '../models/info/spot_meta.dart';
+import '../models/info/spot_clearinghouse_state.dart';
+import '../models/info/active_asset_data.dart';
 
 /// Provides access to the Hyperliquid Info API.
 ///
@@ -34,22 +40,68 @@ class InfoApi {
   ///
   /// This includes account value, margin summary, and asset positions.
   /// Corresponds to `{"type": "clearinghouseState", "user": "..."}`.
-  Future<Map<String, dynamic>> getUserState(String user) async {
+  Future<ClearinghouseState> getUserState(String user) async {
     final response = await _client.post('/info', data: {
       'type': 'clearinghouseState',
       'user': user,
     });
-    return response.data;
+    return ClearinghouseState.fromJson(response.data);
   }
 
   /// Retrieves the open orders for a specific [user].
   ///
   /// Corresponds to `{"type": "openOrders", "user": "..."}`.
-  Future<List<dynamic>> getOpenOrders(String user) async {
+  Future<List<OpenOrder>> getOpenOrders(String user) async {
     final response = await _client.post('/info', data: {
       'type': 'openOrders',
       'user': user,
     });
-    return response.data;
+    return (response.data as List).map((e) => OpenOrder.fromJson(e)).toList();
+  }
+
+  /// Retrieves the L2 order book for a specific [coin].
+  ///
+  /// [nSigFigs] is the number of significant figures (default 5).
+  /// [mantissa] is the mantissa for aggregation (default null).
+  /// Corresponds to `{"type": "l2Book", "coin": "...", "nSigFigs": ...}`.
+  Future<L2Book> getL2Book(String coin, {int? nSigFigs, int? mantissa}) async {
+    final response = await _client.post('/info', data: {
+      'type': 'l2Book',
+      'coin': coin,
+      if (nSigFigs != null) 'nSigFigs': nSigFigs,
+      if (mantissa != null) 'mantissa': mantissa,
+    });
+    return L2Book.fromJson(response.data);
+  }
+
+  /// Retrieves the spot metadata.
+  ///
+  /// Corresponds to `{"type": "spotMeta"}`.
+  Future<SpotMeta> getSpotMeta() async {
+    final response = await _client.post('/info', data: {'type': 'spotMeta'});
+    return SpotMeta.fromJson(response.data);
+  }
+
+  /// Retrieves the spot clearinghouse state for a specific [user].
+  ///
+  /// Corresponds to `{"type": "spotClearinghouseState", "user": "..."}`.
+  Future<SpotClearinghouseState> getSpotClearinghouseState(String user) async {
+    final response = await _client.post('/info', data: {
+      'type': 'spotClearinghouseState',
+      'user': user,
+    });
+    return SpotClearinghouseState.fromJson(response.data);
+  }
+
+  /// Retrieves the active asset data for a specific [user] and [coin].
+  ///
+  /// Corresponds to `{"type": "activeAssetData", "user": "...", "coin": "..."}`.
+  Future<ActiveAssetData> getActiveAssetData(String user, String coin) async {
+    final response = await _client.post('/info', data: {
+      'type': 'activeAssetData',
+      'user': user,
+      'coin': coin,
+    });
+    return ActiveAssetData.fromJson(response.data);
   }
 }

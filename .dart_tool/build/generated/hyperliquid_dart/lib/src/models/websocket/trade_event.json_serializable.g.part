@@ -1,0 +1,32 @@
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+TradeEvent _$TradeEventFromJson(Map<String, dynamic> json) => TradeEvent(
+      data: (json['data'] as List<dynamic>)
+          .map((e) => WsTrade.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$TradeEventToJson(TradeEvent instance) =>
+    <String, dynamic>{
+      'data': instance.data,
+    };
+
+WsTrade _$WsTradeFromJson(Map<String, dynamic> json) => WsTrade(
+      coin: json['coin'] as String,
+      side: json['side'] as String,
+      px: json['px'] as String,
+      sz: json['sz'] as String,
+      time: (json['time'] as num).toInt(),
+      hash: json['hash'] as String,
+    );
+
+Map<String, dynamic> _$WsTradeToJson(WsTrade instance) => <String, dynamic>{
+      'coin': instance.coin,
+      'side': instance.side,
+      'px': instance.px,
+      'sz': instance.sz,
+      'time': instance.time,
+      'hash': instance.hash,
+    };
