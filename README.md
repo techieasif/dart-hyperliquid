@@ -15,61 +15,93 @@ Add the following to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  hyperliquid_dart:
-    path: . # Or git url
+  hyperliquid_dart: ^0.0.1
 ```
 
-## Usage
+## SDK Usage Guide
 
-### Initialization
+### 1. Initialization
+
+First, create an instance of `HyperliquidClient`. You can optionally pass a custom `Dio` instance or base URL.
 
 ```dart
 import 'package:hyperliquid_dart/hyperliquid_dart.dart';
 
 void main() {
-  // Create the client
+  // Default connects to Mainnet (https://api.hyperliquid.xyz)
   final client = HyperliquidClient();
   
-  // Initialize APIs
-  final infoApi = InfoApi(client);
-  
-  // For authenticated requests (Exchange API)
-  // final wallet = EthPrivateKey.fromHex('YOUR_PRIVATE_KEY');
-  // final exchangeApi = ExchangeApi(client, wallet);
+  // For Testnet:
+  // final client = HyperliquidClient(baseUrl: 'https://api.hyperliquid-testnet.xyz');
 }
 ```
 
-### Fetching Data (Info API)
+### 2. Public Info API
+
+The `InfoApi` allows you to fetch public data without authentication.
 
 ```dart
-// Get metadata (universe, margin tables)
-final meta = await infoApi.getMeta();
+final infoApi = InfoApi(client);
 
-// Get current mid prices
+// 1. Get Exchange Metadata (Universe, Margin Tables)
+final meta = await infoApi.getMeta();
+print('Total assets: ${meta.universe.length}');
+print('First asset: ${meta.universe.first.name}'); // e.g., BTC
+
+// 2. Get Current Prices (Mids)
 final mids = await infoApi.getAllMids();
 print('BTC Price: ${mids['BTC']}');
+print('ETH Price: ${mids['ETH']}');
+
+// 3. Get User State (Account Value, Positions)
+final userAddress = '0x...';
+final userState = await infoApi.getUserState(userAddress);
+print('Account Value: ${userState['marginSummary']['accountValue']}');
+
+// 4. Get Open Orders
+final openOrders = await infoApi.getOpenOrders(userAddress);
+print('Open Orders: ${openOrders.length}');
 ```
 
-### Placing Orders (Exchange API)
+### 3. Exchange API (Trading)
+
+The `ExchangeApi` requires a private key for signing requests. This SDK handles the complex EIP-712 signing and msgpack serialization for you.
 
 ```dart
 import 'package:web3dart/web3dart.dart';
 
 // Initialize with your private key
-final wallet = EthPrivateKey.fromHex('YOUR_PRIVATE_KEY');
-final exchangeApi = ExchangeApi(client, wallet);
+final privateKey = 'YOUR_PRIVATE_KEY_HEX'; // e.g. "0x..."
+final wallet = EthPrivateKey.fromHex(privateKey);
 
-// Place a limit order
-final result = await exchangeApi.placeOrders([
-  OrderRequest(
-    assetIndex: 0, // Asset index for BTC (check meta.universe)
-    isBuy: true,   // Buy
-    price: "30000",
-    size: "0.01",
-    reduceOnly: false,
-    orderType: OrderType.limit(tif: 'Gtc'), // Good Til Cancelled
-  )
-]);
+// Create Exchange API instance (set isMainnet to false for Testnet)
+final exchangeApi = ExchangeApi(client, wallet, isMainnet: true);
+
+// 1. Place an Order
+try {
+  final result = await exchangeApi.placeOrders([
+    OrderRequest(
+      assetIndex: 0, // Index for BTC (find this in meta.universe)
+      isBuy: true,   // Buy
+      price: "30000",
+      size: "0.01",
+      reduceOnly: false,
+      orderType: OrderType.limit(tif: 'Gtc'), // Good Til Cancelled
+    )
+  ]);
+  print('Order placed: $result');
+} catch (e) {
+  print('Order failed: $e');
+}
+
+// 2. Cancel an Order
+try {
+  // You need the order ID (oid) from openOrders or placeOrder response
+  final result = await exchangeApi.cancelOrder('BTC', 123456789);
+  print('Order cancelled: $result');
+} catch (e) {
+  print('Cancel failed: $e');
+}
 ```
 
 ## Development
