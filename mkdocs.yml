@@ -1,7 +1,7 @@
 site_name: Hyperliquid Dart SDK
 site_description: A strongly-typed, comprehensive Dart SDK for the Hyperliquid API.
-site_url: https://your-username.github.io/dart-hyperliquid/
-repo_url: https://github.com/your-username/dart-hyperliquid
+site_url: https://techieasif.github.io/dart-hyperliquid/
+repo_url: https://github.com/techieasif/dart-hyperliquid
 repo_name: dart-hyperliquid
 
 theme:
