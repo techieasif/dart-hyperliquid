@@ -1,0 +1,38 @@
+site_name: Hyperliquid Dart SDK
+site_description: A strongly-typed, comprehensive Dart SDK for the Hyperliquid API.
+site_url: https://your-username.github.io/dart-hyperliquid/
+repo_url: https://github.com/your-username/dart-hyperliquid
+repo_name: dart-hyperliquid
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: teal
+      accent: purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: teal
+      accent: lime
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+plugins:
+  - search
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - API Reference:
+    - Info API: info-api.md
+    - Exchange API: exchange-api.md
+    - WebSocket API: websocket-api.md
+  - Utilities: utilities.md
