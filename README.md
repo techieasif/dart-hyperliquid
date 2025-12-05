@@ -1,3 +1,4 @@
+# ** EXPERIMENTAL UNDER DEVELOPMENT ** 
 # Hyperliquid Dart SDK
 
 A Dart SDK for the [Hyperliquid API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api), designed to provide a type-safe and easy-to-use wrapper for building trading bots and applications on Hyperliquid.
